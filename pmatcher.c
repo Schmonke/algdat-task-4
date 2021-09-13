@@ -84,11 +84,7 @@ void free_stack(p_stack *s)
 
 void print_help()
 {
-    printf(
-        "You must specify whether to read from file or STDIN using -f or -s\n"
-        "E.g. Read from file : pmatcher -f ./myfile.c\n"
-        "     Read from STDIN: cat myfile.c | pmatcher -s\n"
-    );
+    printf("You must specify which file to read from as an argument to the program.\n");
 }
 
 int get_p_index(char c)
