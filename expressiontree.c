@@ -126,7 +126,7 @@ char* createExpression(TreeNode *n)
     if(n->value.isNumber)
     {
         char* mem = (char*)(malloc(12));
-        itoa(n->value.number, mem, 10);
+        sprintf(mem, "%d", n->value.number);
         return mem;
     }
     else
@@ -172,5 +172,5 @@ int main()
     TreeNode *rootNode=newOpteratorNode(MULTIPLICATION, newNumberNode(3), node_4);
 
     printf("Height: %d \n", findHeight(rootNode));
-    printf("Expression: %s = %d",createExpression(rootNode), calculate(rootNode));
+    printf("Expression: %s = %d\n",createExpression(rootNode), calculate(rootNode));
 }
