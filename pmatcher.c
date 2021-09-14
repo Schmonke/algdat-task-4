@@ -156,7 +156,7 @@ int run_on_file(FILE *file)
 
             if (buf[i] == et.open)
             {
-                // Push open p onto stack
+                // Push open p_tuple onto stack
                 if (push_stack(&s, P_TUPLES[pindex]))
                 {
                     printf("Unable to push stack\n");
@@ -193,7 +193,7 @@ int run_on_file(FILE *file)
         }
     } while (fgets(buf, sizeof(buf) / sizeof(buf[0]), file) != NULL);
 
-    // A non-empty stack means where are unclosed ps.
+    // A non-empty stack means there are unclosed p_tuples.
     if (get_stack_count(&s) != 0)
     {
         p_tuple t;
