@@ -3,11 +3,18 @@
 #include <string.h>
 #include <errno.h>
 
+/** 
+ * p_tuple represents a tuple containing an open and close token for a 
+ * parenthesis/square bracket.
+ */
 typedef struct {
     char open;
     char close;
 } p_tuple;
 
+/**
+ * p_stack is a stack for p_tuples.
+ */
 typedef struct {
     p_tuple *data;
     size_t length;
@@ -15,6 +22,9 @@ typedef struct {
 } p_stack;
 const size_t P_STACK_DEFAULT_LENGTH = 16;
 
+/**
+ * All of the p_tuples to match. 
+ */
 const p_tuple P_TUPLES[] =
 {
     (p_tuple){ .open = '(', .close = ')' },
@@ -23,6 +33,9 @@ const p_tuple P_TUPLES[] =
 };
 const int P_TUPLES_LENGTH = sizeof(P_TUPLES) / sizeof(P_TUPLES[0]);
 
+/** 
+ * Creates a new zero-sized stack.
+ */
 p_stack create_stack() 
 {
     return (p_stack) 
@@ -33,6 +46,9 @@ p_stack create_stack()
     };
 }
 
+/**
+ * Pushes a p_tuple onto the stack.
+ */
 int push_stack(p_stack *s, p_tuple item)
 {
     if (s->count + sizeof(p_tuple) > s->length)
@@ -51,11 +67,18 @@ int push_stack(p_stack *s, p_tuple item)
     return 0;
 }
 
+/**
+ * Gets the count of items on the stack.
+ */
 size_t get_stack_count(p_stack *s)
 {
     return s->count;
 }
 
+/**
+ * Gets a copy of stack top element and sets it to specified
+ * tuple.
+ */
 int peek_stack(p_stack *s, p_tuple *tuple)
 {
     if (tuple == NULL) return 1;
@@ -65,6 +88,9 @@ int peek_stack(p_stack *s, p_tuple *tuple)
     return 0;
 }
 
+/**
+ * Pops the last element from the stack and writes it to tuple.
+ */
 int pop_stack(p_stack *s, p_tuple *tuple)
 {
     if (tuple == NULL) return 1;
@@ -74,6 +100,9 @@ int pop_stack(p_stack *s, p_tuple *tuple)
     return 0;
 }
 
+/**
+ * Frees the stack from memory.
+ */
 void free_stack(p_stack *s) 
 {
     free(s->data);
@@ -82,11 +111,18 @@ void free_stack(p_stack *s)
     s->length = 0;
 }
 
+
 void print_help()
 {
-    printf("You must specify which file to read from as an argument to the program.\n");
+    printf(
+        "You must specify which file to read from as an argument to the program.\n"
+        "E.g. ./pmatcher ~/main.c\n"
+    );
 }
 
+/**
+ * Gets the p_tuple index in P_TUPLES from the topmost element in the stack.
+ */
 int get_p_index(char c)
 {
     for (int i = 0; i < P_TUPLES_LENGTH; i++)
@@ -99,6 +135,9 @@ int get_p_index(char c)
     return -1;
 }
 
+/**
+ * Runs pmatcher on a specific file.
+ */
 int run_on_file(FILE *file)
 {
     char buf[255];
@@ -115,8 +154,11 @@ int run_on_file(FILE *file)
     do
     {
         int l = strlen(buf);
+
+        // Loop over all characters in the buffer.
         for (int i = 0; i < l; i++)
         {
+            // Checks whether the character is a p_tuple.
             int pindex = get_p_index(buf[i]);
             if (pindex == -1) continue;
             p_tuple et = P_TUPLES[pindex];
@@ -169,6 +211,9 @@ int run_on_file(FILE *file)
     return ret;
 }
 
+/**
+ * Opens and reads reads file from specified filepath before running program on file.
+ */
 int handle_file(char *file_path)
 {
     FILE *file = fopen(file_path, "r");
@@ -179,6 +224,7 @@ int handle_file(char *file_path)
     }
     return run_on_file(file);
 }
+
 
 int main(int argc, char* argv[]) 
 {
