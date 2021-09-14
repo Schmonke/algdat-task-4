@@ -111,15 +111,6 @@ void free_stack(p_stack *s)
     s->length = 0;
 }
 
-
-void print_help()
-{
-    printf(
-        "You must specify which file to read from as an argument to the program.\n"
-        "E.g. ./pmatcher ~/main.c\n"
-    );
-}
-
 /**
  * Gets the p_tuple index in P_TUPLES from the topmost element in the stack.
  */
@@ -165,6 +156,7 @@ int run_on_file(FILE *file)
 
             if (buf[i] == et.open)
             {
+                // Push open p onto stack
                 if (push_stack(&s, P_TUPLES[pindex]))
                 {
                     printf("Unable to push stack\n");
@@ -173,6 +165,7 @@ int run_on_file(FILE *file)
             }
             else if (buf[i] == et.close)
             {
+                // Try to peek stack.
                 p_tuple t;
                 if (get_stack_count(&s) == 0)
                 {
@@ -184,6 +177,8 @@ int run_on_file(FILE *file)
                     printf("Unable to peek stack\n");
                     return 1;
                 }
+
+                // Pop last element off the stack if it is matching, else, show error.
                 if (buf[i] != t.close)
                 {
                     printf("ERROR: Expected '%c', got '%c'\n", t.close, buf[i]);
@@ -198,6 +193,7 @@ int run_on_file(FILE *file)
         }
     } while (fgets(buf, sizeof(buf) / sizeof(buf[0]), file) != NULL);
 
+    // A non-empty stack means where are unclosed ps.
     if (get_stack_count(&s) != 0)
     {
         p_tuple t;
@@ -225,6 +221,14 @@ int handle_file(char *file_path)
     return run_on_file(file);
 }
 
+void print_help()
+{
+    printf(
+        "You must specify which file to read from as an argument to the program.\n"
+        "Usage: pmatcher <file_name>\n"
+        "E.g. ./pmatcher ~/main.c\n"
+    );
+}
 
 int main(int argc, char* argv[]) 
 {
