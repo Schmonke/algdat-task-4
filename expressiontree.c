@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+/** 
+ * OperatorType is the type of operator an operator node has. 
+ */
 typedef enum OperatorType
 {
     PLUS,
@@ -10,6 +13,9 @@ typedef enum OperatorType
     DIVISION
 } OperatorType;
 
+/**
+ * NodeValue is the value of a node.
+ */
 typedef struct NodeValue
 {
     union
@@ -20,74 +26,70 @@ typedef struct NodeValue
     int isNumber;
 } NodeValue;
 
-typedef struct TreeNodeStruct
+/**
+ * TreeNode represents a node in the tree.
+ */
+typedef struct TreeNode
 {
     NodeValue value;
-    struct TreeNodeStruct* left;
-    struct TreeNodeStruct* right;
+    struct TreeNode* left;
+    struct TreeNode* right;
 } TreeNode;
 
-TreeNode* newOpteratorNode(OperatorType operatortype, TreeNode *l, TreeNode *r)
+/**
+ * newOperatorNode creates a new node with the specified operator type and children.
+ */
+TreeNode* newOperatorNode(OperatorType type, TreeNode *l, TreeNode *r)
 {
     TreeNode* treeNode = (TreeNode*)(malloc(sizeof(TreeNode)));
-    treeNode->left=l;
-    treeNode->right=r;
-    treeNode->value= (NodeValue){
-        .isNumber=0,
-        .operatorType=operatortype,
+    treeNode->left = l;
+    treeNode->right = r;
+    treeNode->value = (NodeValue) {
+        .isNumber = 0,
+        .operatorType = type,
     };
     return treeNode;
 }
 
+/**
+ * newNumberNode creates a leaf node that contains a numeric value.
+ */
 TreeNode* newNumberNode(int number)
 {
     TreeNode* res = (TreeNode*)(malloc(sizeof(TreeNode)));
-    res->value=(NodeValue){
-        .isNumber=1,
-        .number=number,
+    res->left = 0;
+    res->right = 0;
+    res->value = (NodeValue) {
+        .isNumber = 1,
+        .number = number,
     };
-    res->left=0;
-    res->right=0;
     return res;
 }
 
-typedef struct 
-{
-    TreeNode* root;
-}Tree;
-
-Tree* newTree(TreeNode *n)
-{
-    Tree *res = (Tree*)malloc(sizeof(Tree));
-    res->root=n;
-    return res;
-}
-int empty(Tree* t)
-{
-    return !(t->root);
-}
-
+/**
+ * findHeight finds the height of a tree.
+ */
 int findHeight(TreeNode* n)
 {
-    if(!n) return -1;
-    else
-    {
-        int lr = findHeight(n->left);
-        int rr = findHeight(n->right);
-        if(lr>=rr) return lr +1;
-        else return rr +1;
-    }
+    if (!n) return -1;
+
+    int lr = findHeight(n->left);
+    int rr = findHeight(n->right);
+    return lr >= rr ? lr + 1 : rr + 1;
 }
 
-
+/**
+ * calculate traverses the expression tree and calculates the result.
+ */
 int calculate(TreeNode *n)
 {
     int num;
     if(n->value.isNumber)
     {
-    num=n->value.number;
+        num=n->value.number;
     }
-    else{
+    else
+    {
         int left = calculate(n->left);
         int right = calculate(n->right);
         switch (n->value.operatorType)
@@ -112,15 +114,11 @@ int calculate(TreeNode *n)
     return num;
 }
 
-int traverse(TreeNode* n)
-{
-  if(!n) return 0;
-    int result = calculate(n);
-    traverse(n->left);
-    traverse(n->right);
-    return result;
-}
-
+/**
+ * createExpression creates a string that contains a mathematic expression for the given tree.
+ *
+ * NOTE: The string that is returned from createExpression must be freed.
+ */
 char* createExpression(TreeNode *n)
 {
     if(n->value.isNumber)
@@ -165,12 +163,18 @@ char* createExpression(TreeNode *n)
 
 int main()
 {
-    TreeNode *node_1=newOpteratorNode(MULTIPLICATION,newNumberNode(16),newNumberNode(32));
-    TreeNode *node_2=newOpteratorNode(MINUS, node_1, newNumberNode(-5));
-    TreeNode *node_3=newOpteratorNode(PLUS, newNumberNode(9), newNumberNode(12));
-    TreeNode *node_4=newOpteratorNode(PLUS, node_3, node_2);
-    TreeNode *rootNode=newOpteratorNode(MULTIPLICATION, newNumberNode(3), node_4);
+    TreeNode *node1 = newOperatorNode(MULTIPLICATION, newNumberNode(16), newNumberNode(32));
+    TreeNode *node2 = newOperatorNode(MINUS, node1, newNumberNode(-5));
+    TreeNode *node3 = newOperatorNode(PLUS, newNumberNode(9), newNumberNode(12));
+    TreeNode *node4 = newOperatorNode(PLUS, node3, node2);
+    TreeNode *rootNode = newOperatorNode(MULTIPLICATION, newNumberNode(3), node4);
 
-    printf("Height: %d \n", findHeight(rootNode));
-    printf("Expression: %s = %d\n",createExpression(rootNode), calculate(rootNode));
+    int height = findHeight(rootNode);
+    char *expression = createExpression(rootNode);
+    int result = calculate(rootNode);
+
+    printf("Height: %d \n", height);
+    printf("Expression: %s = %d\n", expression, result);
+
+    free(expression);
 }
