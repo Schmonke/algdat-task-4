@@ -119,44 +119,40 @@ int calculate(TreeNode *n)
  *
  * NOTE: The string that is returned from createExpression must be freed.
  */
-char* createExpression(TreeNode *n)
+
+void createExpressionInorder(TreeNode *n)
 {
-    if(n->value.isNumber)
+    char symbol;    
+     if(n->value.isNumber)
     {
-        char* mem = (char*)(malloc(12));
-        sprintf(mem, "%d", n->value.number);
-        return mem;
+        printf("%d",n->value.number);
     }
     else
     {
-        char* left = createExpression(n->left);
-        char* right = createExpression(n->right);
-        int length = strlen(left)+strlen(right)+4;
-        char* mem = (char*)(malloc(length));
-        char op;
+        printf("(");
+        createExpressionInorder(n->left);
         switch (n->value.operatorType)
         {
         case PLUS:
-            op = '+';
+            symbol = '+';
             break;
         case MINUS:
-            op = '-';
+            symbol = '-';
             break;
         case MULTIPLICATION:
-            op = '*';
+            symbol = '*';
             break;
         case DIVISION:
-            op='/';
+            symbol='/';
             break;
         default:
             printf("### printing fail ####");
             break;
         }
-
-        sprintf(mem, "(%s%c%s)",left, op, right);
-        free(left);
-        free(right);
-        return mem;
+        printf("%c", symbol);
+        createExpressionInorder(n->right);
+        printf(")");
+        
     }
 }
 
@@ -170,11 +166,9 @@ int main()
     TreeNode *rootNode = newOperatorNode(MULTIPLICATION, newNumberNode(3), node4);
 
     int height = findHeight(rootNode);
-    char *expression = createExpression(rootNode);
     int result = calculate(rootNode);
 
-    printf("Height: %d \n", height);
-    printf("Expression: %s = %d\n", expression, result);
-
-    free(expression);
+    printf("\nHeight: %d \n", height);
+    createExpressionInorder(rootNode);
+    printf(" = %d\n", result);
 }
