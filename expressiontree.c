@@ -117,7 +117,6 @@ int calculate(TreeNode *n)
 /**
  * createExpression creates a string that contains a mathematic expression for the given tree.
  *
- * NOTE: The string that is returned from createExpression must be freed.
  */
 
 void createExpressionInorder(TreeNode *n)
@@ -152,7 +151,6 @@ void createExpressionInorder(TreeNode *n)
         printf("%c", symbol);
         createExpressionInorder(n->right);
         printf(")");
-        
     }
 }
 
